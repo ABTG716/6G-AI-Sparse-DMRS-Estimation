@@ -431,7 +431,7 @@ At **3GPP RAN1 #119bis in Prague (October 2025)**, Samsung proposed "Alt.1" for 
 
 The model only operates on the 408 DMRS resource elements, not the full grid. This keeps complexity low.
 
-![Samsung Reference from Prague Meeting](/Users/aadityabijarniya/.gemini/antigravity/brain/f839919a-efab-4189-8ada-5c55916dd974/samsung_reference.jpg)
+![Samsung Reference from Prague Meeting](../results/samsung_reference.jpg)
 
 #### Experiment 3a: First Implementation (`xyz.py`) — FAILED
 
@@ -489,7 +489,7 @@ A detailed analysis was performed (documented in conversation `a6ae3a0e`):
 
 **Training Dynamics**:
 
-![Alt.1 v2 Training Metrics](/Users/aadityabijarniya/.gemini/antigravity/brain/f839919a-efab-4189-8ada-5c55916dd974/training_metrics_plot.png)
+![Alt.1 v2 Training Metrics](../results/training_metrics.png)
 
 Key observations:
 - **No divergence**: Full-recon loss decreases monotonically (the v1 failure mode is completely fixed)
