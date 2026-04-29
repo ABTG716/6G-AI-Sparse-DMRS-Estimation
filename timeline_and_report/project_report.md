@@ -431,7 +431,6 @@ At **3GPP RAN1 #119bis in Prague (October 2025)**, Samsung proposed "Alt.1" for 
 
 The model only operates on the 408 DMRS resource elements, not the full grid. This keeps complexity low.
 
-![Samsung Reference from Prague Meeting](../results/samsung_reference.jpg)
 
 #### Experiment 3a: First Implementation (`xyz.py`) — FAILED
 
