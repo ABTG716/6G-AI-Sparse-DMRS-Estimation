@@ -82,7 +82,11 @@ gantt
 
 #### Phase 2d: Production Dataset (late Feb – early Mar 2026)
 
-- Separate production script scaled to **51 PRBs (612 subcarriers)**, **2 Rx ports**
+**File**: `dataset_gen/final_dataset_script_for_denoiser/dataset/generate_ai_dataset.m`
+
+- Production-scale script using MATLAB 6G Exploration Library (`pre6G` APIs)
+- Scaled to **51 PRBs (612 subcarriers)**, **2 Rx ports**, CDL-C, 4 GHz, 30 km/h
+- SNR range: 0–30 dB (16 levels × 6,400 slots each)
 - **102,400 samples** generated in **18 hours**
 - Output: `dataset_sparse_fd.h5` (21.8 GB) — [OneDrive](https://1drv.ms/f/c/630f9b47e52a7119/IgD1YY3KvhmTQbQGa6NlAH59AUw5l8LlGeAF9gJUGRve2zQ?e=HQAhgg)
 
