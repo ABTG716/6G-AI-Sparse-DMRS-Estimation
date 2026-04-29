@@ -14,9 +14,9 @@ gantt
     3GPP study, NR fundamentals, AI/ML TDocs :done, 2025-12-01, 2026-01-15
 
     section MATLAB Simulation
-    DLSCH_PDSCH_script (basic sim)            :done, 2026-01-15, 2026-01-28
-    continuous_dataset_generator (continuous) :done, 2026-01-28, 2026-02-10
-    Multiple_UE_v1 (300 UE scaling)           :done, 2026-02-10, 2026-02-20
+    01_basic_nr_simulation (basic sim)        :done, 2026-01-15, 2026-01-28
+    02_continuous_waveform (continuous)       :done, 2026-01-28, 2026-02-10
+    03_multi_ue_scaling (300 UE scaling)      :done, 2026-02-10, 2026-02-20
 
     section Dataset Generation
     Production dataset script development     :done, 2026-02-20, 2026-02-27
@@ -56,7 +56,7 @@ gantt
 
 #### Phase 2a: Basic 5G NR Simulation (mid Jan 2026)
 
-**File**: `DLSCH_PDSCH_script.m`
+**File**: `dataset_gen/01_basic_nr_simulation.m`
 
 - Built complete 5G NR downlink chain using MATLAB 5G Toolbox
 - Configuration: 4×1 MIMO, CDL-A channel, 30 kHz SCS, 8 PRBs, QPSK
@@ -65,7 +65,7 @@ gantt
 
 #### Phase 2b: Continuous Waveform (late Jan – Feb 2026)
 
-**File**: `continuous_dataset_generator_Final.m`
+**File**: `dataset_gen/02_continuous_waveform.m`
 
 - Restructured to **single continuous waveform** across 400 slots
 - One-shot OFDM modulation → single channel call → one-shot demodulation
@@ -74,7 +74,7 @@ gantt
 
 #### Phase 2c: Multi-UE Scaling (mid Feb 2026)
 
-**File**: `Multiple_UE_v1.m`
+**File**: `dataset_gen/03_multi_ue_scaling.m`
 
 - 300 independent UEs with randomised CDL seeds
 - Total: 120,000 channel snapshots
@@ -92,7 +92,7 @@ gantt
 
 #### Phase 3a: First Attempt — FAILED (early–mid Mar 2026)
 
-**File**: `alt1/xyz.py`
+**File**: `denoiser_transformer/alt1_mixer_v1.py`
 
 - MLP-Mixer: d_model=32, 2 layers, ~113K params
 - 25% mask ratio, SSL loss on masked tokens only
@@ -115,12 +115,12 @@ gantt
 
 #### Phase 3c: Fixed Implementation — SUCCESS (late Mar – early Apr 2026)
 
-**File**: `alt1/alt1_transformer.py`
+**File**: `denoiser_transformer/alt1_mixer_v2.py`
 
 - All six fixes applied, trained 120 epochs (~4.5 hrs on CUDA GPU)
 - **Result**: −15.91 dB NMSE ✅ (15.9 dB noise reduction)
 
-| Metric | v1 (xyz.py) | v2 (alt1_transformer.py) |
+| Metric | v1 (alt1_mixer_v1.py) | v2 (alt1_mixer_v2.py) |
 |--------|:-----------:|:------------------------:|
 | NMSE vs Ideal H | +0.46 dB ❌ | **−15.91 dB** ✅ |
 | Parameters | ~113K | ~273K |
