@@ -1,0 +1,109 @@
+# AI-Native Sparse DMRS Channel Estimation for 5G NR / 6G
+
+> AI-native receiver design for sparse DMRS channel estimation in 5G NR, implementing Samsung's Alt.1 self-supervised approach ([3GPP R1-2500xxx](https://www.3gpp.org), RAN1 #119bis, Prague) — a key building block for 6G AI-integrated air interfaces.
+
+## Overview
+
+In 5G NR, DMRS (Demodulation Reference Signals) occupy only **~4.8% of resource elements** — making channel estimation from these sparse pilots a fundamental challenge. This project implements a **self-supervised MLP-Mixer** that denoises LS channel estimates at these sparse DMRS positions, requiring **no ideal channel labels** for training.
+
+The model achieves **−15.91 dB NMSE** against the ideal channel, representing a **15.9 dB noise reduction** over raw LS estimates.
+
+## Project Timeline
+
+| Phase | Period | Description |
+|-------|--------|-------------|
+| **Literature & 3GPP Study** | Dec 2025 – Jan 2026 | Study of 3GPP AI/ML TDocs (incl. Samsung's Alt.1 proposal), NR physical layer, channel models |
+| **MATLAB Simulation** | Jan – Feb 2026 | NR downlink pipeline: basic → continuous waveform → multi-UE scaling |
+| **Dataset Generation** | Feb – early Mar 2026 | Production dataset: 102,400 samples, 21.8 GB, 18 hrs generation |
+| **AI Model Design** | Mar – Apr 2026 | MLP-Mixer v1 (failed), diagnosis, v2 (−15.91 dB NMSE) |
+| **Documentation** | Apr 2026 | Report, analysis, and project handover |
+
+## Repository Structure
+
+```
+.
+├── README.md
+├── dataset_gen/                           # 5G NR simulation & data generation (MATLAB)
+│   ├── 01_basic_nr_simulation.m           #   Basic NR sim (20 slots, SVD precoding)
+│   ├── 02_continuous_waveform.m           #   Continuous waveform (400 slots, random precoding)
+│   └── 03_multi_ue_scaling.m              #   Multi-UE scaling (300 UEs, 120K snapshots)
+├── denoiser_transformer/                  # Self-supervised DMRS denoiser (Python/PyTorch)
+│   ├── alt1_mixer_v2.py                   #   Final model — 273K params, −15.91 dB NMSE ✅
+│   ├── alt1_mixer_v1.py                   #   Initial model — FAILED (+0.46 dB NMSE) ❌
+│   ├── plot_metrics.py                    #   Training dashboard generator
+│   └── count_flops.py                     #   FLOPs & parameter counter
+├── results/                               # Training outputs
+│   ├── training_log.txt                   #   Training log (120 epochs)
+│   └── training_metrics.png               #   Training metrics dashboard
+└── timeline_and_report/                   # Project documentation
+    ├── project_report.md                  #   Full project report & experiment log
+    └── project_timeline.md                #   Detailed project timeline
+```
+
+## Dataset
+
+The model was trained on `dataset_sparse_fd.h5` (**21.8 GB, 102,400 samples**), hosted externally due to size:
+
+📦 **[Download Dataset (OneDrive)](https://1drv.ms/f/c/630f9b47e52a7119/IgD1YY3KvhmTQbQGa6NlAH59AUw5l8LlGeAF9gJUGRve2zQ?e=HQAhgg)**
+
+| Key | Shape | Description |
+|-----|-------|-------------|
+| `/input_ls_real/imag` | `[612, 14, 2, N]` | Sparse LS estimates at DMRS (zero elsewhere) |
+| `/dmrs_mask` | `[612, 14]` | Binary DMRS mask |
+| `/alt1_ideal_real/imag` | `[408, 2, N]` | Perfect H at DMRS (eval only) |
+| `/alt1_pract_real/imag` | `[408, 2, N]` | MMSE@30dB H at DMRS (eval only) |
+| `/snr_db` | `[N]` | Per-sample SNR |
+
+**Grid**: 612 subcarriers × 14 symbols (51 PRBs), 2 Rx ports, RMS-normalised per sample.
+
+## Quick Start
+
+```bash
+# Training
+cd denoiser_transformer && python alt1_mixer_v2.py
+
+# Visualise training
+python plot_metrics.py
+
+# Check FLOPs
+python count_flops.py
+```
+
+**Requirements**: PyTorch (CUDA), h5py, numpy, matplotlib
+
+## Results
+
+| Metric | v1 (`alt1_mixer_v1.py`) | v2 (`alt1_mixer_v2.py`) |
+|--------|:---:|:---:|
+| NMSE vs Ideal H | +0.46 dB ❌ | **−15.91 dB** ✅ |
+| NMSE vs Pract H | +0.46 dB ❌ | **−15.89 dB** ✅ |
+| Parameters | ~113K | ~273K |
+| Noise Reduction | None | **15.9 dB** |
+
+![Training Metrics](results/training_metrics.png)
+
+## Key Design Decisions
+
+- **Self-supervised (SSL)**: Masks 50% of sparse DMRS tokens; model reconstructs from remaining 50%
+- **Combined loss**: SSL loss + 0.5 × full-reconstruction regulariser (prevents shortcut learning)
+- **EMA**: Exponential moving average (decay=0.998) for stable evaluation
+- **FiLM conditioning**: SNR-adaptive denoising via learned scale/shift parameters
+- **Checkpoint on `va_full`**: Saves based on full reconstruction quality, not just masked prediction
+
+## 3GPP Context
+
+This work implements the **AI receiver (Alt.1)** approach proposed by Samsung at **3GPP RAN1 #119bis, Prague (October 2025)** and being standardised for future 6G systems:
+- **TDoc**: Samsung R1-2500xxx — "Self-supervised learning for AI-based channel estimation"
+- **Study Item**: AI/ML for NR Air Interface (3GPP TR 38.843, Release 18/19)
+- **Architecture**: MLP-Mixer (~273K params, ~30 MFLOPs) — fits UE complexity constraints
+- **Pipeline**: `r, p → LS estimation → [AI Denoise @ DMRS] → Freq interp → Time interp → h_est`
+
+## References
+
+- Samsung, "Alt.1: Self-supervised learning for AI-based channel estimation", 3GPP RAN1 #119bis, Prague, Oct 2025
+- 3GPP TR 38.843: Study on AI/ML for NR Air Interface
+- 3GPP TS 38.211 / TS 38.212 / TS 38.214: NR Physical Layer specifications
+
+## License
+
+Undergraduate research project. Contact author for usage permissions.
